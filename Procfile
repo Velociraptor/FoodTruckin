@@ -1,1 +1,1 @@
-web: gunicorn FoodTruckin:routes
+web: gunicorn routes:app
