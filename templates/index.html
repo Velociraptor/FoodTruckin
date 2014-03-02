@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <head>
+    <title>{{title}}</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map-canvas { height: 80% }
+    </style>
+    <script type="text/javascript"
+      src='https://maps.googleapis.com/maps/api/js?sensor=false'>
+    </script>
+    <script type="text/javascript">
+      var infowindow = null;
+      function initialize() {
+        var mapOptions = {
+          center: new google.maps.LatLng({{latitude}}, {{longitude}}),
+          zoom: 15
+        };
+        var map = new google.maps.Map(document.getElementById("map-canvas"),
+            mapOptions);
+
+        infowindow = new google.maps.InfoWindow({
+          content: "holding..."
+        });
+        
+        var truckTrucks = '[{{ ", ".join(trucks)}}]';
+        var myTrucks = truckTrucks.replace(/&#39;/g,"");
+        myTrucks = myTrucks.replace(/&#34;/g,'"');
+        console.log(myTrucks);
+
+        var myTrucks = JSON.parse(myTrucks);
+
+
+        for (var i=0;i<myTrucks.length;i++) {
+            var truck = myTrucks[i];
+            var myLatlng = new google.maps.LatLng(truck.lat, truck.lng);
+            var marker = new google.maps.Marker({
+                position: myLatlng,
+                map: map,
+                title: truck.name
+            });
+            marker.html = '<div id="content">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h1 id="firstHeading" class="firstHeading">'+truck.name+'</h1>'+
+      '<div id="bodyContent">'+truck.item+
+      '</div>';
+            
+            google.maps.event.addListener(marker, 'click', function() {
+              infowindow.setContent(this.html);
+              infowindow.open(map,this);
+            });
+        }
+
+      }
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+    <h1>
+        {{title}}
+    </h1>
+    <form action="" method="post">
+        <p><input type=text name="center" placeholder="Specify Address">
+        <p><input type=text name="food_type" placeholder="Hungry for...">
+        <p><input type=submit value='Find Food!'>
+    </form>
+    <div id="map-canvas"/>
+  </body>
+</html>
