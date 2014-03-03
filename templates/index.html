@@ -9,6 +9,7 @@
       html { height: 100% }
       body { height: 100%; margin: 0; padding: 0 }
       #map-canvas { height: 80% }
+      #truckHeading { color: black }
     </style>
     <script type="text/javascript"
       src='https://maps.googleapis.com/maps/api/js?sensor=false'>
@@ -45,7 +46,7 @@
             marker.html = '<div id="content">'+
       '<div id="siteNotice">'+
       '</div>'+
-      '<h1 id="firstHeading" class="firstHeading">'+truck.name+'</h1>'+
+      '<h5 id="truckHeading" class="truckHeading">'+truck.name+'</h5>'+
       '<div id="bodyContent">'+truck.item+
       '</div>';
             
