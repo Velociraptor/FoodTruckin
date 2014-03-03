@@ -3,6 +3,7 @@
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <head>
     <title>{{title}}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='cyborg.css') }}">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <style type="text/css">
       html { height: 100% }
@@ -29,7 +30,6 @@
         var truckTrucks = '[{{ ", ".join(trucks)}}]';
         var myTrucks = truckTrucks.replace(/&#39;/g,"");
         myTrucks = myTrucks.replace(/&#34;/g,'"');
-        console.log(myTrucks);
 
         var myTrucks = JSON.parse(myTrucks);
 
@@ -64,9 +64,12 @@
         {{title}}
     </h1>
     <form action="" method="post">
-        <p><input type=text name="center" placeholder="Specify Address">
+        <p><input type=text name="center" placeholder="Where to?">
         <p><input type=text name="food_type" placeholder="Hungry for...">
         <p><input type=submit value='Find Food!'>
+        <h4>
+          Currently showing: {{food_fill}} food trucks near {{center_fill}}
+        </h4>
     </form>
     <div id="map-canvas"/>
   </body>

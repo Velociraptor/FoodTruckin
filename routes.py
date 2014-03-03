@@ -1,5 +1,4 @@
 #!flask/bin/python
-# special thanks: http://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
 
 from flask import Flask, render_template, request, url_for
 import urllib2, json
@@ -24,15 +23,16 @@ def index():
 
     (latitude, longitude) = get_lat_lng(center)
     return render_template('index.html',
-        title = 'Food Truckin',
+        title = "Food Truckin'",
         latitude = latitude,
         longitude = longitude,
         trucks = food_trucks,
-        how_many_trucks = len(food_trucks))
+        center_fill = center,
+        food_fill = food_type)
 
 def get_lat_lng(address):
     (latitude,longitude) = (37.7833, -122.4167)
-    address = urllib2.quote(address)
+    address = urllib2.quote(address + ' San Francisco') # cross streets entered should now localize to SF rather than other places
     url='http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false' % address
     response = urllib2.urlopen(url).read()
     try:
@@ -47,7 +47,7 @@ def get_trucks(food_type):
     if food_type == 'all':
         response = urllib2.urlopen('https://data.sfgov.org/resource/rqzj-sfat.json')
         trucks = json.loads(response.read())
-        truck_jsons = [] #I know this is weird and backwards, but something in the json is causing illegal character issues with javascript and I have no idea why
+        truck_jsons = [] # Having issues with the json in javascript so just parsing what is needed here for now
         for truck in trucks:
             try:
                 name = truck['applicant']
@@ -61,14 +61,21 @@ def get_trucks(food_type):
         return truck_jsons
     else:
         response = urllib2.urlopen('https://data.sfgov.org/resource/rqzj-sfat.json')
-        trucks = response.read()
-        return trucks
-
-@app.route('/quakes')
-def quakes():
-    response = urllib2.urlopen('http://soda.demo.socrata.com/resource/earthquakes.json?$where=magnitude>5')
-    quakes = response.read()
-    return quakes
+        trucks = json.loads(response.read())
+        truck_jsons = []
+        for truck in trucks:
+            try:
+                name = truck['applicant']
+                item = truck['fooditems']
+                if food_type.lower() not in item.lower():
+                    continue
+                lat = truck['latitude']
+                lng = truck['longitude']
+                truck_json = '{"name":"%s","item":"%s","lat":"%s","lng":"%s"}' %(name,item,lat,lng)
+                truck_jsons.append(str(truck_json))
+            except:
+                pass
+        return truck_jsons
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
